@@ -25,15 +25,15 @@ describeTestsWithOptions({
 function describeTestsWithOptions(options, postText) {
   describe('markdown-it-attrs.utils' + postText, () => {
     it(replaceDelimiters('should parse {.class ..css-module #id key=val}', options), () => {
-      let src = '{.red ..mod #head key=val}';
-      let expected = [['class', 'red'], ['css-module', 'mod'], ['id', 'head'], ['key', 'val']];
+      let src = '{.red ..mod #head data-key=val}';
+      let expected = [['class', 'red'], ['css-module', 'mod'], ['id', 'head'], ['data-key', 'val']];
       let res = utils.getAttrs(replaceDelimiters(src, options), 0, options);
       assert.deepEqual(res, expected);
     });
 
     it(replaceDelimiters('should parse attributes with = {attr=/id=1}', options), () => {
-      let src = '{link=/some/page/in/app/id=1}';
-      let expected = [['link', '/some/page/in/app/id=1']];
+      let src = '{data-link=/some/page/in/app/id=1}';
+      let expected = [['data-link', '/some/page/in/app/id=1']];
       let res = utils.getAttrs(replaceDelimiters(src, options), 0, options);
       assert.deepEqual(res, expected);
     });
@@ -46,8 +46,8 @@ function describeTestsWithOptions(options, postText) {
     });
 
     it(replaceDelimiters('should add attributes when {} in end of last inline', options), () => {
-      src = 'some text {with=attrs}';
-      expected = '<p with="attrs">some text</p>\n';
+      src = 'some text {data-with=attrs}';
+      expected = '<p data-with="attrs">some text</p>\n';
       assert.equal(md.render(replaceDelimiters(src, options)), expected);
     });
 
@@ -58,8 +58,8 @@ function describeTestsWithOptions(options, postText) {
     });
 
     it(replaceDelimiters('should add attributes when {} in last line', options), () => {
-      src = 'some text\n{with=attrs}';
-      expected = '<p with="attrs">some text</p>\n';
+      src = 'some text\n{data-with=attrs}';
+      expected = '<p data-with="attrs">some text</p>\n';
       assert.equal(md.render(replaceDelimiters(src, options)), expected);
     });
 
@@ -82,14 +82,14 @@ function describeTestsWithOptions(options, postText) {
     });
 
     it(replaceDelimiters('should support classes, css-modules, identifiers and attributes in same {}', options), () => {
-      src = 'some text {attr=lorem .class ..css-module #id}';
-      expected = '<p attr="lorem" class="class" css-module="css-module" id="id">some text</p>\n';
+      src = 'some text {data-attr=lorem .class ..css-module #id}';
+      expected = '<p data-attr="lorem" class="class" css-module="css-module" id="id">some text</p>\n';
       assert.equal(md.render(replaceDelimiters(src, options)), expected);
     });
 
     it(replaceDelimiters('should support attributes inside " {attr="lorem ipsum"}', options), () => {
-      src = 'some text {attr="lorem ipsum"}';
-      expected = '<p attr="lorem ipsum">some text</p>\n';
+      src = 'some text {data-attr="lorem ipsum"}';
+      expected = '<p data-attr="lorem ipsum">some text</p>\n';
       assert.equal(md.render(replaceDelimiters(src, options)), expected);
     });
 
@@ -217,21 +217,21 @@ function describeTestsWithOptions(options, postText) {
     });
 
     it(replaceDelimiters('should work with typography enabled', options), () => {
-      src = 'text {key="val with spaces"}';
-      expected = '<p key="val with spaces">text</p>\n';
+      src = 'text {data-test="val with spaces"}';
+      expected = '<p data-test="val with spaces">text</p>\n';
       let res = md.set({ typographer: true }).render(replaceDelimiters(src, options));
       assert.equal(res, expected);
     });
 
     it(replaceDelimiters('should support code blocks', options), () => {
-      src = '```{.c a=1 #ii}\nfor i in range(10):\n```';
-      expected = '<pre><code class="c" a="1" id="ii">for i in range(10):\n</code></pre>\n';
+      src = '```{.c #ii}\nfor i in range(10):\n```';
+      expected = '<pre><code class="c" id="ii">for i in range(10):\n</code></pre>\n';
       assert.equal(md.render(replaceDelimiters(src, options)), expected);
     });
 
     it(replaceDelimiters('should support code blocks with language defined', options), () => {
-      src = '```python {.c a=1 #ii}\nfor i in range(10):\n```';
-      expected = '<pre><code class="c language-python" a="1" id="ii">for i in range(10):\n</code></pre>\n';
+      src = '```python {.c #ii}\nfor i in range(10):\n```';
+      expected = '<pre><code class="c language-python" id="ii">for i in range(10):\n</code></pre>\n';
       assert.equal(md.render(replaceDelimiters(src, options)), expected);
     });
 
@@ -304,11 +304,11 @@ function describeTestsWithOptions(options, postText) {
       assert.equal(md.render(replaceDelimiters(src, options)), expected);
     });
 
-    it(replaceDelimiters('should support {} curlies with length == 3', options), () => {
-      src = 'text {1}';
-      expected = '<p 1="">text</p>\n';
-      assert.equal(md.render(replaceDelimiters(src, options)), expected);
-    });
+    // it(replaceDelimiters('should support {} curlies with length == 3', options), () => {
+    //   src = 'text {1}';
+    //   expected = '<p 1="">text</p>\n';
+    //   assert.equal(md.render(replaceDelimiters(src, options)), expected);
+    // });
 
     it(replaceDelimiters('should do nothing with empty classname {.}', options), () => {
       src = 'text {.}';
@@ -325,6 +325,12 @@ function describeTestsWithOptions(options, postText) {
     it(replaceDelimiters('should support horizontal rules ---{#id}', options), () => {
       src = '---{#id}';
       expected = '<hr id="id">\n';
+      assert.equal(md.render(replaceDelimiters(src, options)), expected);
+    });
+
+    it(replaceDelimiters('should only allow whitelisted attributes', options), () => {
+      src = 'text {data-test style="color: red" onload="fetch(http://bad.site.com/)"}';
+      expected = '<p data-test="" style="color: red">text</p>\n';
       assert.equal(md.render(replaceDelimiters(src, options)), expected);
     });
   });

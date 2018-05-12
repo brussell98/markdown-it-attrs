@@ -1,8 +1,7 @@
 language: node_js
 node_js:
+  - '10'
   - '6'
   - '4'
 notifications:
-  email:
-    on_success: change
-    on_failure: change
+  email: false

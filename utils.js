@@ -105,7 +105,7 @@ exports.addAttrs = function (attrs, token) {
       token.attrJoin('class', attrs[j][1]);
     } else if (key === 'css-module') {
       token.attrJoin('css-module', attrs[j][1]);
-    } else {
+    } else if (key === 'style' || key.startsWith('data-') || key === 'id') {
       token.attrPush(attrs[j]);
     }
   }
