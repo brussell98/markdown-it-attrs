@@ -1,6 +1,6 @@
 {
   "name": "markdown-it-attrs",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "Add classes, identifiers and attributes to your markdown with {} curly brackets, similar to pandoc's header attributes",
   "main": "index.js",
   "license": "MIT",
@@ -44,12 +44,12 @@
     "babelify": "^7.3.0",
     "browserify": "^13.1.0",
     "eslint": "^4.3.0",
-    "markdown-it": ">=7.0.1",
+    "markdown-it": "^9.0.0",
     "markdown-it-implicit-figures": "^0.6.0",
     "mocha": "*"
   },
   "peerDependencies": {
-    "markdown-it": ">=7.0.1"
+    "markdown-it": "^9.0.0"
   },
   "tonicExampleFilename": "demo.js"
 }
